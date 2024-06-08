@@ -13,42 +13,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Rota não autenticada
-router.post("/register", async (req, res) => {
-  const { nome, email, senha, funcao } = req.body;
-
-  // Verificar se o email já está em uso
-  const usuarioExistente = await Usuario.findOne({ email });
-  if (usuarioExistente) {
-    return res.status(400).send("Email já está em uso");
-  }
-
-  // Criar um novo usuário
-  const usuario = new Usuario({ nome, email, senha, funcao });
-
-  // Salvar o usuário no banco de dados
-  await usuario.save();
-
-  // Enviar uma resposta de sucesso
-  res.status(201).send("Usuário criado com sucesso");
-});
-
-// Rota autenticada para retornar o perfil do usuário
-router.get("/profile", verifyToken, async (req, res) => {
-  // Buscar o usuário no banco de dados usando o ID armazenado no token
-  const usuario = await Usuario.findById(req.user._id);
-
-  // Verificar se o usuário existe
-  if (!usuario) {
-    return res.status(404).send("Usuário não encontrado");
-  }
-
-  // Enviar uma resposta com o perfil do usuário
-  res.status(200).json(usuario);
-});
-
-//rota de login
-
+// Rota de login
 router.post("/login", async (req, res) => {
   const { email, senha } = req.body;
 
@@ -67,7 +32,7 @@ router.post("/login", async (req, res) => {
   res.status(200).json({ token });
 });
 
-//Rota de cadastro
+// Rota de cadastro
 router.post("/register", async (req, res) => {
   const { nome, email, senha, funcao } = req.body;
 
@@ -79,6 +44,15 @@ router.post("/register", async (req, res) => {
 
   // Enviar uma resposta de sucesso
   res.status(201).send("Usuário criado com sucesso");
+});
+
+// Rota autenticada para retornar o perfil do usuário
+router.get("/profile", verifyToken, async (req, res) => {
+  // Buscar o usuário no banco de dados usando o ID armazenado no token
+  const usuario = await Usuario.findById(req.user._id);
+
+  // Enviar uma resposta com o perfil do usuário
+  res.status(200).json(usuario);
 });
 
 // Rota para editar um usuário específico
@@ -96,7 +70,7 @@ router.put("/:id", verifyToken, async (req, res) => {
   res.status(200).json(usuario);
 });
 
-//Rota para excluir um usuário específico
+// Rota para excluir um usuário específico
 router.delete("/:id", verifyToken, async (req, res) => {
   // Excluir o usuário do banco de dados
   await Usuario.findByIdAndDelete(req.params.id);
@@ -105,7 +79,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
   res.status(200).send("Usuário excluído com sucesso");
 });
 
-//Rota para trazer a quantidade de usuários separados por função
+// Rota para trazer a quantidade de usuários separados por função
 router.get("/count", verifyToken, async (req, res) => {
   // Contar o número de usuários para cada função
   const count = await Usuario.aggregate([

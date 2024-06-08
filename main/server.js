@@ -1,27 +1,27 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const itemRoutes = require("./routes/items");
-const userRoutes = require("./routes/users");
+require("dotenv").config();
+
 const app = express();
-app.use(express.json()); // Para poder acessar req.body
-const port = 3000;
+app.use(express.json());
 
-// Conexão com o MongoDB
+const TodoRoutes = require("./routes/todo");
+app.use("/Todo", TodoRoutes);
+
 mongoose
-  .connect(
-    "mongodb+srv://talesasfurlan:AaRUQmnEsCmTKFIe@cluster0.vhh3c0v.mongodb.net/",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
-  .then(() => console.log("MongoDB Connected..."))
-  .catch((err) => console.log(err));
+  .connect(process.env.DB_CONNECTION, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    app.listen(27017, () => {
+      console.log("Conectado ao MongoDB");
+      console.log("Servidor iniciado na porta 27017");
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
-// Usar as rotas
-app.use("/items", itemRoutes);
-app.use("/users", userRoutes);
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+const usuarioRoutes = require("./routes/usuario");
+app.use("/usuario", usuarioRoutes);
